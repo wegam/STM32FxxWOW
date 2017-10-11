@@ -32,12 +32,6 @@
 ; 
 ;*******************************************************************************
 
-; If you need to use external SRAM mounted on STM3210E-EVAL board as data memory,
-; change the following define value to '1' (or choose ENABLE in Configuration Wizard window)
-;//   <o>  External SRAM Configuration  <0=> DISABLE <1=> ENABLE 
-DATA_IN_ExtSRAM  EQU     0
-
-
 ; Amount of memory (in bytes) allocated for Stack
 ; Tailor this value to your application needs
 ; <h> Stack Configuration
@@ -181,82 +175,15 @@ __Vectors_Size  EQU  __Vectors_End - __Vectors
 
 ; Reset handler
 Reset_Handler    PROC
-                 EXPORT  Reset_Handler
-				 
-				         IF      DATA_IN_ExtSRAM == 1
-; FSMC Bank1 NOR/SRAM3 is used for the STM3210E-EVAL, if another Bank is 
-; required, then adjust the Register Addresses
+                 EXPORT  Reset_Handler             [WEAK]
+        IMPORT  SystemInit
+        IMPORT  __main
 
-
-; Enable FSMC clock
-				         LDR R0,= 0x00000114 
-				         LDR R1,= 0x40021014
-				         STR R0,[R1]	                 
-                  
-; Enable GPIOD, GPIOE, GPIOF and GPIOG clocks
-				         LDR R0,= 0x000001E0
-				         LDR R1,= 0x40021018
-				         STR R0,[R1]	   
-
-; SRAM Data lines, NOE and NWE configuration 
-; SRAM Address lines configuration 
-; NOE and NWE configuration   
-; NE3 configuration 
-; NBL0, NBL1 configuration 
-
-				         LDR R0,= 0x44BB44BB 
-				         LDR R1,= 0x40011400
-				         STR R0,[R1]		
-				 
-				         LDR R0,= 0xBBBBBBBB 
-				         LDR R1,= 0x40011404
-				         STR R0,[R1]		
-				 
-				         LDR R0,= 0xB44444BB 
-				         LDR R1,= 0x40011800
-				         STR R0,[R1]		
-				 
-				         LDR R0,= 0xBBBBBBBB 
-				         LDR R1,= 0x40011804
-				         STR R0,[R1]		
-				 
-				         LDR R0,= 0x44BBBBBB 
-				         LDR R1,= 0x40011C00
-				         STR R0,[R1]	    
-
-				         LDR R0,= 0xBBBB4444 
-				         LDR R1,= 0x40011C04
-				         STR R0,[R1]	    
-
-				         LDR R0,= 0x44BBBBBB
-				         LDR R1,= 0x40012000
-				         STR R0,[R1]		
-
-				         LDR R0,= 0x44444B44
-				         LDR R1,= 0x40012004
-				         STR R0,[R1]      
-				         
-; FSMC Configuration   
-; Enable FSMC Bank1_SRAM Bank 
-
-				        LDR R0,= 0x00001011
-				        LDR R1,= 0xA0000010
-				        STR R0,[R1]	
-
-				        LDR R0,= 0x00000200 
-				        LDR R1,= 0xA0000014
-				        STR R0,[R1]	
-
-				  		 
-				        ENDIF
-				        
-				        
-				 IMPORT  __main
+                 LDR     R0, =SystemInit
+                 BLX     R0
                  LDR     R0, =__main
                  BX      R0
                  ENDP
-
-                 ALIGN
 
 ; Dummy Exception Handlers (infinite loops which can be modified)
 
